@@ -72,6 +72,7 @@ var
    SongChange:Boolean;
    lskey     :byte;
    LInsCol   :Byte;              { Last Instrument Color ( WrCmd ) }
+   initialized :boolean;
 
 label 1,2;
 const
@@ -275,7 +276,7 @@ begin
                             CurIns[i2] := TMEta^.Data and $ff;
                             setsound(i2);
                           end;
-                     2  : UMF.Tempo := TMEta^.Data and $ff;
+                     2  : UMF.tempo := TMEta^.Data and $ff;
                      3  : begin
                             bdval := bdval or  32;
                             access($bd,bdval,bport);
@@ -358,6 +359,23 @@ begin
        end
        else dec(Pl_Count);
      end;
+end;
+
+procedure startPlay;
+begin
+  for in1 := 0 to maxoch do
+  begin
+    Pl_Note[in1]  := 0;
+    Pl_Order[in1] := 0;
+  end;
+  Pl_Count:= 0;
+  setintvec($1c,addr(playhandler));
+  playon := not playon;
+  for in1 := 0 to maxch do
+  begin
+    soundoff(in1);
+    sl[in1].on := false;
+  end;
 end;
 
 procedure PlayHandler2; Interrupt;
@@ -475,8 +493,24 @@ begin
      end;
 end;
 
+procedure startPlay2;
+begin
+  Pl2_Note  := 0;
+  Pl2_Count := 0;
+  if segsize = 0 then segsize := $10;
+  Pl2_Place := segsize*(curnote div segsize);
+  setintvec($1c,addr(playhandler2));
+  playon := not playon;
+  for in1 := 0 to maxch do
+  begin
+    soundoff(in1);
+    sl[in1].on := false;
+  end;
+end;
+
 procedure Init;
 var i1 :word;
+var s1 :string;
 begin
      TextMode(Co80+Font8x8);
      Mark(HeapSt);
@@ -514,6 +548,21 @@ begin
 
      AreaOn2 := false;
 
+     if initialized <> true then
+     begin
+      s1 := paramstr(1);
+      if s1 <> '' then
+      begin
+        loadjzz(s1);
+        if errcode = 0 then
+        begin
+          UMFName := s1;
+          SongChange := false;
+          startPlay;
+        end;
+      end;
+    end;
+    initialized := true;
 end;
 
 procedure StartScr;
@@ -1097,7 +1146,7 @@ begin
     $1c0d : case curpos of
               0 : rdStr(UMF.Title,OWin[4].x1+12,OWin[4].y1,32,$05);
               1 : RdInt(SegSize,OWin[4].x1+12,OWin[4].y1+1,3,$05);
-              2 : RdInt(UMF.Tempo,OWin[4].x1+12,OWin[4].y1+2,1,$05);
+              2 : RdInt(UMF.tempo,OWin[4].x1+12,OWin[4].y1+2,1,$05);
             end;
 
   end;
@@ -1742,34 +1791,8 @@ begin
                   until (key = $011b) or (endo);
                 end;
        $3b00   : sounds;
-       $3c00   : begin
-                   for in1 := 0 to maxoch do
-                   begin
-                     Pl_Note[in1]  := 0;
-                     Pl_Order[in1] := 0;
-                   end;
-                   Pl_Count:= 0;
-                   setintvec($1c,addr(playhandler));
-                   playon := not playon;
-                   for in1 := 0 to maxch do
-                   begin
-                     soundoff(in1);
-                     sl[in1].on := false;
-                   end;
-                 end;
-       $3d00   : begin
-                   Pl2_Note  := 0;
-                   Pl2_Count := 0;
-                   if segsize = 0 then segsize := $10;
-                   Pl2_Place := segsize*(curnote div segsize);
-                   setintvec($1c,addr(playhandler2));
-                   playon := not playon;
-                   for in1 := 0 to maxch do
-                   begin
-                     soundoff(in1);
-                     sl[in1].on := false;
-                   end;
-                 end;
+       $3c00   : startPlay;
+       $3d00   : startPlay2;
        $3e00   : OrderEdit;
        $3f00   : loadsong;
        $4000   : saveCurSong;
