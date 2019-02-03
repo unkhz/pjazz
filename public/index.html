@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta property="og:title" content="PaRAlleL JazZ v1.0β" />
+  <meta property="og:description" content="The weirdest tracker written in 1995 with Turbo Pascal, running in a dosbox. It uses the 9 channels of the opl2 FM synthesizer in the Soundblaster Pro sound card. Press F2 to make it quiet." />
+  <meta property="og:type" content="music.album" />
+  <meta property="og:url" content="https://pjazz.khz.fi" />
+  <meta property="og:image" content="https://pjazz.khz.fi/pjazz.jpg" />
+  <title>PaRAlleL JazZ v1.0β</title>
+  <script src="js-dos.js"></script>
+  <style>
+    html,
+    body {
+      background: #000000 none;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    .dosbox-container {
+      margin: auto;
+      display: inline-block;
+    }
+
+    @media screen and (orientation: landscape) {
+      .dosbox-container {
+        width: 150vh;
+        height: 100vh;
+      }
+    }
+
+    @media screen and (orientation: portrait) {
+      .dosbox-container {
+        width: 100%;
+        height: 75vw;
+      }
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #overlay {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      color: white;
+      background: black none;
+      font-family: "Terminal", "VT323", monospace;
+      font-size: 32px;
+    }
+
+    #overlay > * {
+      margin: 0 auto;
+      display: inline-block;
+      text-align: left;
+      width: 640px;
+      white-space: pre;
+      height: 1.1em;
+    }
+
+    a,
+    a#visited,
+    a#active {
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet" />
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133731732-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-133731732-1');
+  </script>
+</head>
+
+<body>
+  <canvas id="jsdos" tabindex="0" autofocus></canvas>
+  <div id="overlay">
+    <span>SELECT FILE TO EDIT</span>
+    <span>===================</span>
+    <span></span>
+    <a href="#TUNE001.JZZ" onclick="startPjazz('TUNE001.JZZ')">TUNE001  JZZ         37,864    16 Jun 1995</a>
+    <a href="#TUNE002.JZZ" onclick="startPjazz('TUNE002.JZZ')">TUNE002  JZZ         34,624     7 Jul 1995</a>
+    <a href="#TUNE003.JZZ" onclick="startPjazz('TUNE003.JZZ')">TUNE003  JZZ         19,348    10 May 1995</a>
+    <a href="#TUNE004.JZZ" onclick="startPjazz('TUNE004.JZZ')">TUNE004  JZZ         35,820    28 May 1995</a>
+    <a href="#TUNE005.JZZ" onclick="startPjazz('TUNE005.JZZ')">TUNE005  JZZ         35,944    24 May 1995</a>
+    <a href="#TUNE006.JZZ" onclick="startPjazz('TUNE006.JZZ')">TUNE006  JZZ         26,728    16 May 1995</a>
+    <a href="#TUNE007.JZZ" onclick="startPjazz('TUNE007.JZZ')">TUNE007  JZZ         26,532    21 May 1995</a>
+    <a href="#TUNE008.JZZ" onclick="startPjazz('TUNE008.JZZ')">TUNE008  JZZ         35,792    27 Jun 1995</a>
+    <a href="#TUNE009.JZZ" onclick="startPjazz('TUNE009.JZZ')">TUNE009  JZZ         24,680     8 Jun 1995</a>
+    <a href="#TUNE00A.JZZ" onclick="startPjazz('TUNE00A.JZZ')">TUNE00A  JZZ         14,876    29 May 1995</a>
+    <a href="#TUNE00B.JZZ" onclick="startPjazz('TUNE00B.JZZ')">TUNE00B  JZZ         21,788     2 Jun 1995</a>
+    <a href="#TUNE00C.JZZ" onclick="startPjazz('TUNE00C.JZZ')">TUNE00C  JZZ         22,294    10 Jul 1995</a>
+    <a href="#TUNE00D.JZZ" onclick="startPjazz('TUNE00D.JZZ')">TUNE00D  JZZ         45,078     1 Dec 1996</a>
+    <a href="#TUNE00E.JZZ" onclick="startPjazz('TUNE00E.JZZ')">TUNE00E  JZZ         17,146    27 Jun 1995</a>
+    <a href="#TUNE00F.JZZ" onclick="startPjazz('TUNE00F.JZZ')">TUNE00F  JZZ         44,972    31 Jan 1996</a>
+    <a href="#TUNE010.JZZ" onclick="startPjazz('TUNE010.JZZ')">TUNE010  JZZ         45,020    27 Jan 1996</a>
+    <a href="#TUNE011.JZZ" onclick="startPjazz('TUNE011.JZZ')">TUNE011  JZZ         12,494    10 Jul 1995</a>
+    <a href="#TUNE012.JZZ" onclick="startPjazz('TUNE012.JZZ')">TUNE012  JZZ         13,696     4 Feb 1996</a>
+    <span>  25 File(s)        600,425 Bytes.</span>
+    <span>   0 Dir(s)     262,144,000 Bytes free.</span>
+  </div>
+  <script>
+      var realConsoleLog = console.log;
+      console.log = function(message) {
+        if (message === 'SDL_Quit called (and ignored)') {
+          setTimeout(function() {
+            location.reload();
+          }, 300);
+        }
+        realConsoleLog.apply(null, arguments);
+      }
+      function extract() {
+        return new Promise(function (resolve) {
+          Dos(document.getElementById("jsdos")).ready(function (fs, main) {
+            fs.extract("pjazz.zip").then(function () {
+              resolve(main);
+            });
+          });
+        });
+      }
+      function startPjazz(filename) {
+
+
+          console.log("Starting PJAZZ.EXE with", filename);
+          extract().then(function (main) {
+            main(["PJAZZ.BAT", filename, "-exit", "-noconsole", "-c", "SET FILENAME=" + filename]);
+            document.getElementById("overlay").style.display = "none";
+            document.title = "PaRAlleL JazZ - " + filename;
+            window.onhashchange = function() {
+              location.reload();
+            }
+          });
+      }
+    </script>
+    <!-- Go to www.addthis.com/dashboard to customize your tools -->
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5c572900582676c1"></script>
+</body>
+</html>
