@@ -1,0 +1,1 @@
+The weirdest tracker written in 1995 with Turbo Pascal, running in a dosbox. It uses the 9 channels of the opl2 FM synthesizer in the Soundblaster Pro sound card. Press F2 to make it quiet.
