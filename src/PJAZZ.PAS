@@ -841,6 +841,7 @@ var
   valinc :shortint;
   lins,sins  :byte;
   TempPos     :POSRec;
+  s1 :string;
 const
   IReg:array[4..29] of byte = (8,9,4,5,4,5,6,7,6,7,2,3,2,3,0,1,0,1,0,1,0,1,0,1,10,10);
   MaxVal:array[4..29]of byte= (1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,2,0);
@@ -962,7 +963,10 @@ begin
                         RdInt(LIns,OWin[2].x1+12,OWin[2].y1+1,3,col_note);
                         LoadSound(lins,cins);
                       end;
-                 0  : RdXY(bnkfile,OWin[2].x1+11,OWin[2].y1,12,col_note);
+                 0  : begin
+                        RdXY(s1,OWin[2].x1+11,OWin[2].y1,12,col_note);
+                        bnkfile := s1;
+                      end;
                end;
 
    {   $1c0d  : begin
@@ -1123,6 +1127,7 @@ begin
 end;
 
 procedure SetupSong;
+var s1:string;
 begin
   curpos := 0;
   bordWin(OWin[4].x1,OWin[4].y1,OWin[4].x2,OWin[4].y2,
@@ -1144,7 +1149,11 @@ begin
     $4800 : dec(curpos);
     $5000 : inc(CurPos);
     $1c0d : case curpos of
-              0 : rdStr(UMF.Title,OWin[4].x1+12,OWin[4].y1,32,$05);
+              0 :
+                begin
+                  rdStr(s1,OWin[4].x1+12,OWin[4].y1,33,$05);
+                  UMF.title := s1;
+                end;
               1 : RdInt(SegSize,OWin[4].x1+12,OWin[4].y1+1,3,$05);
               2 : RdInt(UMF.tempo,OWin[4].x1+12,OWin[4].y1+2,1,$05);
             end;
