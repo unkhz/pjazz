@@ -1,0 +1,25 @@
+{
+  "name": "pjazz",
+  "version": "1.0.0",
+  "description": "The weirdest tracker written in 1995 with Turbo Pascal, running in a dosbox. It uses the 9 channels of the opl2 FM synthesizer in the Soundblaster Pro sound card. Press F2 to make it quiet.",
+  "main": "index.js",
+  "scripts": {
+    "compile": "bin/compile.sh",
+    "build": "bin/build.sh",
+    "start": "npm run build && serve dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unkhz/pjazz.git"
+  },
+  "author": "Juhani Pelli <juhani.pelli@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unkhz/pjazz/issues"
+  },
+  "homepage": "https://github.com/unkhz/pjazz#readme",
+  "dependencies": {
+    "js-dos": "^6.22.11",
+    "serve": "^10.1.1"
+  }
+}

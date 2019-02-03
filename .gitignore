@@ -1,0 +1,4 @@
+build/*
+tp
+dist
+node_modules
