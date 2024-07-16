@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pjazz
+  labels:
+    app: pjazz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pjazz
+  template:
+    metadata:
+      labels:
+        app: pjazz
+    spec:
+      containers:
+        - name: pjazz
+          image: ghcr.io/unkhz/pjazz:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 300
+            timeoutSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pjazz-service
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: pjazz.khz.fi
+spec:
+  selector:
+    app: pjazz
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pjazz-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+    - host: pjazz.khz.fi
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pjazz-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - pjazz.khz.fi
+      secretName: pjazz-tls
