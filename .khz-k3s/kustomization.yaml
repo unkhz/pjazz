@@ -5,4 +5,4 @@ resources:
   - deployment.yaml
 images:
   - name: ghcr.io/unkhz/pjazz:latest
-    newTag: 9a16c4ea2235f9850fb8b8a739f33af8ee020ccd
+    newTag: d6643d92977a8a8bf00858c8c6b359c47c84a63e
