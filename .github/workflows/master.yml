@@ -21,7 +21,7 @@ jobs:
       - name: Setup node 20
         uses: actions/setup-node@v7
         with:
-          node-version: "24"
+          node-version: "26"
 
       - name: Run npm install
         run: npm install
