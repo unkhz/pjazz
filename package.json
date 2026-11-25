@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/unkhz/pjazz#readme",
   "dependencies": {
-    "js-dos": "^6.22.59"
+    "js-dos": "^8.0.0"
   }
 }
